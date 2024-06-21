@@ -1,4 +1,4 @@
-import tkinter
+import tkinter as tk
 import time
 import turtle
 
@@ -80,39 +80,27 @@ def update(planets: list[Planet], dt: float):
 
 
 def main() -> None:
-  planet1 = Planet(pos=[10, 7, 8], vel=[0, 0, 0], acc=[0, 0, 0], mass=4)
-  planet2 = Planet(pos=[4, 1, 3], vel=[0, 0, 0], acc=[0, 0, 0], mass=12)
-  planet3 = Planet(pos=[7, 4, 6], vel=[0, 0, 0], acc=[0, 0, 0], mass=7)
-  planets = [planet1, planet2, planet3]
+    planet1 = Planet(pos=[10, 7, 8], vel=[0, 0, 0], acc=[0, 0, 0], mass=4)
+    planet2 = Planet(pos=[4, 1, 3], vel=[0, 0, 0], acc=[0, 0, 0], mass=12)
+    planet3 = Planet(pos=[7, 4, 6], vel=[0, 0, 0], acc=[0, 0, 0], mass=7)
+    planets = [planet1, planet2, planet3]
 
-  t = time.clock_gettime_ns(time.CLOCK_MONOTONIC) * 1e9
-
-  while True:
-    dt = time.clock_gettime_ns(time.CLOCK_MONOTONIC) * 1e9 - t  # in seconds
-
-    update(planets, dt)
-    for i in range(len(planets)):
-      print(f"Planet: {i} : {planets[i].pos}")
-
+    #ADD tkinter
+    root = tk.Tk()
+    root.title = "Body Simulation"
+    root.mainloop()
+    
     t = time.clock_gettime_ns(time.CLOCK_MONOTONIC) * 1e9
+
+    while True:
+        dt = time.clock_gettime_ns(time.CLOCK_MONOTONIC) * 1e9 - t  # in seconds
+
+        update(planets, dt)
+        for i in range(len(planets)):
+            print(f"Planet: {i} : {planets[i].pos}")
+
+        t = time.clock_gettime_ns(time.CLOCK_MONOTONIC) * 1e9
 
 
 if __name__ == "__main__":
-  # main()
-  from tkinter import *
-  from turtle import RawTurtle, TurtleScreen
-
-  root = Tk()
-  root.title("Tic Tac Toe")
-
-  canvas = Canvas(root, width=300, height=500)
-  canvas.pack(side=LEFT)
-
-  screen = TurtleScreen(canvas)
-
-  tim = RawTurtle(screen)
-  tim.penup()
-
-  img_turtle = RawTurtle(screen)
-
-  screen.mainloop()
+    main()
