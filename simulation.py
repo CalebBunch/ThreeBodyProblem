@@ -7,8 +7,7 @@ G = 6.674 * 10e-11
 
 class Planet:
 
-  def __init__(self, pos: list[float], vel: list[float], acc: list[float],
-               mass: float):
+  def __init__(self, pos: list[float], vel: list[float], acc: list[float], mass: float):
     self._pos = pos
     self._vel = vel
     self._acc = acc
