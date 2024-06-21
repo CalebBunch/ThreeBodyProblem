@@ -1,5 +1,7 @@
 import tkinter as tk
 import turtle as t
+import time
+
 
 G = 6.674 * 10e-11
 
