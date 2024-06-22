@@ -4,7 +4,7 @@ from tkinter import *
 root = Tk()
 
 def k(arg):
-    global root
+    # global root
     l = Label(root)
     l.pack()
 
@@ -19,10 +19,10 @@ def k(arg):
     
 i = 0
 def threaded_function(arg):
-    global i
+    # global i
     while True:
         print(i)
-        i+=1
+        # i+=1
         sleep(1)
         
 
