@@ -9,10 +9,10 @@ G = 6.674 * 10e-11
 
 class Planet:
 
-    def __init__(self, pos: list[float], vel: list[float], acc: list[float], mass: float, canvas: tk.Canvas):
+    def __init__(self, pos: list[float], vel: list[float], mass: float, canvas: tk.Canvas):
         self._pos = pos
         self._vel = vel
-        self._acc = acc
+        self._acc = [0, 0, 0]
         self._mass = mass
 
         self._turtle = turtle.RawTurtle(canvas, shape='circle')
@@ -74,51 +74,57 @@ class Planet:
         grav_x = gravity_mag*math.cos(theta)
         grav_y = gravity_mag*math.sin(theta)
 
-        if self._pos[0] > other.pos[0]:
+        if self._pos[0] > other.pos[0] and grav_x > 0:
             grav_x *= -1
-        if self._pos[1] > other.pos[1]:
+        if self._pos[0] < other.pos[0] and grav_x < 0:
+            grav_x *= -1
+
+        if self._pos[1] > other.pos[1] and grav_y > 0:
+            grav_y *= -1
+        if self.pos[1] < other.pos[1] and grav_y < 0:
             grav_y *= -1
 
+        if vector_magnitude(dist_vector) < 5:
+            grav_x, grav_y = 0, 0
+        
+        #print(grav_x, grav_y)
+        #print(dist_vector)
         return([grav_x, grav_y])
 
 def update(planets: list[Planet], dt: float) -> None:
-    forces = [0, 0]
     for i in range(len(planets)):
+        forces = [0, 0]
         for j in range(len(planets)):
             if i != j:
                 forces = list(map(sum, zip(forces, planets[i].gravitational_force(planets[j]))))
-        planets[i].acc = [a / planets[i].mass for a in forces]
+        planets[i].acc = [f / planets[i].mass for f in forces]
 
         planets[i].vel = [
             planets[i].vel[0] + dt * planets[i].acc[0],
-            planets[i].vel[1] + dt * planets[i].acc[1],
-            #planets[i].vel[2] + dt * planets[i].acc[2]
+            planets[i].vel[1] + dt * planets[i].acc[1]
         ]
 
-        
+    for i in range(len(planets)):
         planets[i].pos = [
             planets[i].pos[0] + dt * planets[i].vel[0],
-            planets[i].pos[1] + dt * planets[i].vel[1],
-            #planets[i].pos[2] + dt * planets[i].vel[2]
+            planets[i].pos[1] + dt * planets[i].vel[1]
         ]
-        
 
 def vector_magnitude(v: list[float]) -> float:
     return sum([i*i for i in v])**0.5
 
 def run(planets: list[Planet]) -> None:
 
-    t = time.clock_gettime_ns(time.CLOCK_MONOTONIC)
+    t = time.clock_gettime(time.CLOCK_MONOTONIC)
     i = 0
     while True:
-        dt = time.clock_gettime_ns(time.CLOCK_MONOTONIC) - t  # in seconds
+        #dt = time.clock_gettime(time.CLOCK_MONOTONIC) - t  # in seconds
+        dt = 0.01
         update(planets, dt)
-        t = time.clock_gettime_ns(time.CLOCK_MONOTONIC)
-        print(f"planet1: {planets[0].pos}")
-        print(f"planet2: {planets[1].pos}")
-        i += 1
-        #if i > 50:
-            #break
+        #t = time.clock_gettime(time.CLOCK_MONOTONIC)
+        #i += 1
+        #if i > 1:
+        #    break
 
 
 def main() -> None:
@@ -130,9 +136,10 @@ def main() -> None:
     canvas = tk.Canvas(root, width=900, height=900)
     canvas.pack()
 
-    planet1 = Planet(pos=[50, 0, 0], vel=[0, 0, 0], acc=[0, 0, 0], mass=10, canvas=canvas)
-    planet2 = Planet(pos=[-50, 0, 0], vel=[0, 0, 0], acc=[0, 0, 0], mass=10, canvas=canvas)
-    planets = [planet1, planet2]
+    planet1 = Planet(pos=[-100, 0, 0], vel=[34.71128135672417, 53.2726851767674, 0], mass=1e15, canvas=canvas)
+    planet2 = Planet(pos=[0, 0, 0], vel=[0, 0, 0], mass=1e15, canvas=canvas)
+    planet3 = Planet(pos=[100, 0, 0], vel = [0, 0, 0], mass = 1e15, canvas = canvas)
+    planets = [planet1, planet2, planet3]
 
     time.sleep(0.5)
 
