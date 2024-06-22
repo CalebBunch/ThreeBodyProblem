@@ -85,7 +85,14 @@ def update(planets: list[Planet], dt: float) -> None:
             planets[i].pos[2] + dt * planets[i].vel[2]
         ]
 
+def run(planets: list[Planet]) -> None:
 
+    t = time.clock_gettime_ns(time.CLOCK_MONOTONIC) * 1e9
+
+    while True:
+        dt = time.clock_gettime_ns(time.CLOCK_MONOTONIC) * 1e9 - t  # in seconds
+        update(planets, dt)
+        t = time.clock_gettime_ns(time.CLOCK_MONOTONIC) * 1e9
 
 def main() -> None:
 
@@ -104,15 +111,6 @@ def main() -> None:
     #canvas.configure(bg="black")
     root.mainloop()
     
-    t = time.clock_gettime_ns(time.CLOCK_MONOTONIC) * 1e9
-
-    while True:
-        dt = time.clock_gettime_ns(time.CLOCK_MONOTONIC) * 1e9 - t  # in seconds
-
-        update(planets, dt)
-        #for i in range(len(planets)):
-        #   print(f"Planet: {i} : {planets[i].pos}")
-        t = time.clock_gettime_ns(time.CLOCK_MONOTONIC) * 1e9
 
 
 if __name__ == "__main__":
