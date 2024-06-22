@@ -89,8 +89,12 @@ def main() -> None:
     #ADD tkinter
     root = tk.Tk()
     root.title ("Body Simulation")
-    root.geometry("900x900")
-    p1 = turtle.RawTurtle(root)
+    canvas = tk.Canvas(root, width=900, height=900)
+    canvas.pack()
+
+    p1 = turtle.RawTurtle(canvas)
+    canvas.configure(bg='black')
+    p1.color('red')
     p1.pendown()
     p1.forward(10)
     root.mainloop()
@@ -101,8 +105,8 @@ def main() -> None:
         dt = time.clock_gettime_ns(time.CLOCK_MONOTONIC) * 1e9 - t  # in seconds
 
         update(planets, dt)
-        for i in range(len(planets)):
-            print(f"Planet: {i} : {planets[i].pos}")
+        #for i in range(len(planets)):
+        #   print(f"Planet: {i} : {planets[i].pos}")
 
         t = time.clock_gettime_ns(time.CLOCK_MONOTONIC) * 1e9
 
