@@ -6,15 +6,12 @@ import math
 
 G = 6.674 * 10e-11
 
-
 class Planet:
-
     def __init__(self, pos: list[float], vel: list[float], mass: float, canvas: tk.Canvas):
         self._pos = pos
         self._vel = vel
         self._acc = [0, 0, 0]
         self._mass = mass
-
         self._turtle = turtle.RawTurtle(canvas, shape='circle')
         self._turtle.speed("fastest")
         self._turtle.penup()
@@ -65,24 +62,23 @@ class Planet:
 
     def gravitational_force(self, other: "Planet") -> list[float]:
         dist_vector = self.calculate_distance_vector(other)
-        theta = math.atan(dist_vector[1]/(dist_vector[0]+1e-9)) # angle of force
+        theta = math.atan(dist_vector[1] / (dist_vector[0] + 1e-9)) # angle of force
         if vector_magnitude(dist_vector) == 0:
             gravity_mag = 0
         else:
-            gravity_mag = (G * self._mass * other.mass)/(vector_magnitude(dist_vector)**2)
+            gravity_mag = (G * self._mass * other.mass) / (vector_magnitude(dist_vector)**2)
         
         grav_x = gravity_mag*math.cos(theta)
         grav_y = gravity_mag*math.sin(theta)
 
-        if self._pos[0] > other.pos[0] and grav_x > 0:
-            grav_x *= -1
-        if self._pos[0] < other.pos[0] and grav_x < 0:
-            grav_x *= -1
-
-        if self._pos[1] > other.pos[1] and grav_y > 0:
-            grav_y *= -1
-        if self.pos[1] < other.pos[1] and grav_y < 0:
-            grav_y *= -1
+        if self._pos[0] > other.pos[0]:
+            grav_x = -abs(grav_x)
+        if self._pos[0] < other.pos[0]:
+            grav_x = abs(grav_x)
+        if self._pos[1] > other.pos[1]:
+            grav_y = -abs(grav_y)
+        if self.pos[1] < other.pos[1]:
+            grav_y = abs(grav_y)
 
         if vector_magnitude(dist_vector) < 5:
             grav_x, grav_y = 0, 0
@@ -111,10 +107,9 @@ def update(planets: list[Planet], dt: float) -> None:
         ]
 
 def vector_magnitude(v: list[float]) -> float:
-    return sum([i*i for i in v])**0.5
+    return sum([s * s for s in v]) ** 0.5
 
 def run(planets: list[Planet]) -> None:
-
     t = time.clock_gettime(time.CLOCK_MONOTONIC)
     i = 0
     while True:
@@ -126,10 +121,7 @@ def run(planets: list[Planet]) -> None:
         #if i > 1:
         #    break
 
-
 def main() -> None:
-
-    #ADD tkinter
     root = tk.Tk()
     root.title ("Body Simulation")
     root.resizable(0, 0)
@@ -149,7 +141,5 @@ def main() -> None:
     #canvas.configure(bg="black")
     root.mainloop()
     
-
-
 if __name__ == "__main__":
     main()
