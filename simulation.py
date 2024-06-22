@@ -88,7 +88,8 @@ def main() -> None:
 
     #ADD tkinter
     root = tk.Tk()
-    root.title = "Body Simulation"
+    root.title ("Body Simulation")
+    root.geometry("900x900")    
     root.mainloop()
     
     t = time.clock_gettime_ns(time.CLOCK_MONOTONIC) * 1e9
