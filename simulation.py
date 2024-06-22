@@ -89,7 +89,7 @@ def main() -> None:
     #ADD tkinter
     root = tk.Tk()
     root.title ("Body Simulation")
-    root.resizable(False, False)
+    root.resizable(0, 0)
     canvas = tk.Canvas(root, width=900, height=900)
     canvas.pack()
 
@@ -98,14 +98,14 @@ def main() -> None:
     p3 = turtle.RawTurtle(canvas, shape="circle")
     
     p1.color("red")
-    p1.pendown()
-    p1.forward(10)
-    p1.goto(-10, 50)
-    p1.penup()
-    p1.goto(0, -50)
-
-    p2.color("white")
-    p2.setpos(20, 20)
+    #p1.pendown()
+    #p1.forward(10)
+    #p1.goto(-10, 50)
+    #p1.penup()
+    p1.goto(0, 100)
+    print(p1.pos())
+    #p2.color("white")
+    #p2.setpos(20, 20)
     # p2.pendown()
     #p2.forward(100)
     
