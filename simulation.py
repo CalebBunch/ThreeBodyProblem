@@ -93,10 +93,22 @@ def main() -> None:
     canvas.pack()
 
     p1 = turtle.RawTurtle(canvas)
-    canvas.configure(bg='black')
-    p1.color('red')
+    p2 = turtle.RawTurtle(canvas)
+    p3 = turtle.RawTurtle(canvas)
+    
+    p1.color("red")
     p1.pendown()
     p1.forward(10)
+    
+    p2.color("white")
+    p2.pendown()
+    p2.forward(100)
+    
+    p3.color("green")
+    p3.pendown()
+    p3.forward(50)
+
+    canvas.configure(bg="black")
     root.mainloop()
     
     t = time.clock_gettime_ns(time.CLOCK_MONOTONIC) * 1e9
