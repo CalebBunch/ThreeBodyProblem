@@ -8,11 +8,16 @@ G = 6.674 * 10e-11
 
 class Planet:
 
-    def __init__(self, pos: list[float], vel: list[float], acc: list[float], mass: float):
+    def __init__(self, pos: list[float], vel: list[float], acc: list[float], mass: float, canvas: tk.Canvas):
         self._pos = pos
         self._vel = vel
         self._acc = acc
         self._mass = mass
+
+        self._turtle = turtle.RawTurtle(canvas, shape='circle')
+        self._turtle.penup()
+        self._turtle.goto(self._pos[0], self._pos[1])
+        self._turtle.pendown()
 
 # Position
 
@@ -23,6 +28,7 @@ class Planet:
     @pos.setter
     def pos(self, newpos: list[float]) -> None:
         self._pos = newpos
+        self._turtle.goto(newpos[0], newpos[1])
 
 # Velocity
 
@@ -52,17 +58,17 @@ class Planet:
         return self._mass
 
     def calculate_distance(self, other: "Planet", index: int) -> float:
-        return ((self.pos[index] - other.pos[index])**2)**0.5
+        return ((self._pos[index] - other.pos[index])**2)**0.5
 
     def gravitational_force(self, other: "Planet") -> list[float]:
         forces = []
-        for idx in range(len(self.pos)):
-            forces.append(G * self.mass * other.mass /
+        for idx in range(len(self._pos)):
+            forces.append(G * self._mass * other.mass /
                 (self.calculate_distance(other, idx) + 1e-9)**2)
         return forces
 
 
-def update(planets: list[Planet], dt: float):
+def update(planets: list[Planet], dt: float) -> None:
     for i in range(len(planets)):
         for j in range(len(planets)):
             if i != j:
@@ -80,11 +86,8 @@ def update(planets: list[Planet], dt: float):
         ]
 
 
+
 def main() -> None:
-    planet1 = Planet(pos=[10, 7, 8], vel=[0, 0, 0], acc=[0, 0, 0], mass=4)
-    planet2 = Planet(pos=[4, 1, 3], vel=[0, 0, 0], acc=[0, 0, 0], mass=12)
-    planet3 = Planet(pos=[7, 4, 6], vel=[0, 0, 0], acc=[0, 0, 0], mass=7)
-    planets = [planet1, planet2, planet3]
 
     #ADD tkinter
     root = tk.Tk()
@@ -93,30 +96,12 @@ def main() -> None:
     canvas = tk.Canvas(root, width=900, height=900)
     canvas.pack()
 
-    p1 = turtle.RawTurtle(canvas, shape="circle")
-    p2 = turtle.RawTurtle(canvas, shape="circle")
-    p3 = turtle.RawTurtle(canvas, shape="circle")
-    
-    p1.color("red")
-    #p1.pendown()
-    #p1.forward(10)
-    #p1.goto(-10, 50)
-    #p1.penup()
-    p1.goto(0, 100)
-    print(p1.pos())
-    #p2.color("white")
-    #p2.setpos(20, 20)
-    # p2.pendown()
-    #p2.forward(100)
-    
+    planet1 = Planet(pos=[10, 7, 8], vel=[0, 0, 0], acc=[0, 0, 0], mass=4, canvas=canvas)
+    planet2 = Planet(pos=[4, 1, 3], vel=[0, 0, 0], acc=[0, 0, 0], mass=12, canvas=canvas)
+    planet3 = Planet(pos=[7, 4, 6], vel=[0, 0, 0], acc=[0, 0, 0], mass=7, canvas=canvas)
+    planets = [planet1, planet2, planet3]
 
-
-    """ 
-    p3.color("green")
-    p3.pendown()
-    p3.forward(50)
-    """
-    canvas.configure(bg="black")
+    #canvas.configure(bg="black")
     root.mainloop()
     
     t = time.clock_gettime_ns(time.CLOCK_MONOTONIC) * 1e9
@@ -127,7 +112,6 @@ def main() -> None:
         update(planets, dt)
         #for i in range(len(planets)):
         #   print(f"Planet: {i} : {planets[i].pos}")
-
         t = time.clock_gettime_ns(time.CLOCK_MONOTONIC) * 1e9
 
 
