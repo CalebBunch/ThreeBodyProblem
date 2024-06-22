@@ -1,7 +1,7 @@
 import tkinter as tk
 import turtle
 import time
-
+from threading import Thread
 
 G = 6.674 * 10e-11
 
@@ -107,6 +107,9 @@ def main() -> None:
     planet2 = Planet(pos=[4, 1, 3], vel=[0, 0, 0], acc=[0, 0, 0], mass=12, canvas=canvas)
     planet3 = Planet(pos=[7, 4, 6], vel=[0, 0, 0], acc=[0, 0, 0], mass=7, canvas=canvas)
     planets = [planet1, planet2, planet3]
+
+    thread = Thread(target=run, args = (planets,))
+    thread.start()
 
     #canvas.configure(bg="black")
     root.mainloop()
