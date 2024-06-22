@@ -1,5 +1,5 @@
 import tkinter as tk
-import turtle as t
+import turtle
 import time
 
 
@@ -89,7 +89,10 @@ def main() -> None:
     #ADD tkinter
     root = tk.Tk()
     root.title ("Body Simulation")
-    root.geometry("900x900")    
+    root.geometry("900x900")
+    p1 = turtle.RawTurtle(root)
+    p1.pendown()
+    p1.forward(10)
     root.mainloop()
     
     t = time.clock_gettime_ns(time.CLOCK_MONOTONIC) * 1e9
