@@ -2,12 +2,14 @@ import tkinter as tk
 import turtle
 from threading import Thread
 import math
+from pathlib import Path
 
-# TODO tkinter initial positions/color customization, dt?
 
+SAVE_PATH = Path("parameters.txt")
 G = 6.674 * 10e-11
+stretch = 0.01
+save_bool = True
 
-STRETCH = 0.01
 
 class Planet:
     def __init__(self, pos: list[float], vel: list[float], mass: float, canvas: tk.Canvas) -> None:
@@ -33,7 +35,7 @@ class Planet:
         self._pos = newpos
         self._turtle.goto(newpos[0], newpos[1])
 
-        sigbase = (lambda z: 1/(1+math.exp(-STRETCH*z)))(newpos[2])
+        sigbase = (lambda z: 1/(1+math.exp(-stretch*z)))(newpos[2])
         r_val = sigbase
         g_val = sigbase
         b_val = sigbase*(-1)+1
@@ -139,6 +141,27 @@ def run(planets: list[Planet]) -> None:
         update(planets, dt)
 
 
+def save_params(planets: list[Planet]) -> None:
+    save = str(input("Would you like to save these parameters (y/n)? ")).lower()
+    if "y" in save:
+        with open(SAVE_PATH, "a") as f:
+            # "1,2,3-3,4,3-3:-3,1,1-3,1,4-2"
+            data = []
+            for planet in planets:
+                data.append(",".join(map(str, planet.pos)) + "|")
+                data.append(",".join(map(str, planet.vel)) + "|")
+                data.append(str(planet.mass))
+                if planet != planets[-1]:
+                    data.append(":")
+                else:
+                    data.append("\n")
+
+            f.write("".join(data))
+    
+    global save_bool
+    save_bool = False
+
+
 def main() -> None:
     root = tk.Tk()
     root.title ("Body Simulation")
@@ -146,22 +169,48 @@ def main() -> None:
     
     canvas = tk.Canvas(root, width=900, height=900)
     canvas.pack()
-    
-    planet1 = Planet(pos=[-100, 0, 0], vel=[34.71128135672417, 53.2726851767674, 0], mass=1e15, canvas=canvas)
-    planet2 = Planet(pos=[0, 10, 50], vel=[0, 0, 19], mass=1.5e15, canvas=canvas)
-    planet3 = Planet(pos=[100, 0, 0], vel=[-30, -50, 0], mass=1e15, canvas=canvas)
 
-    #planet1 = Planet(pos=[-300, 300, 50], vel=[10, 10, -10], mass=1e15, canvas=canvas)
-    #planet2 = Planet(pos=[0, 100, 30], vel=[0, 0, 0], mass=1e15, canvas=canvas)
-    #planet3 = Planet(pos=[-100, 150, 0], vel=[5, 5, 0], mass=1e15, canvas=canvas)
-    planets = [planet1, planet2, planet3]
+    planets = []
     
+    load = str(input("Would you like to load parameters from the save file (y/n)? ")).lower()
+    if "y" in load:
+        index = int(input("Enter the line number for desired parameters: ")) - 1
+        with open(SAVE_PATH, "r") as f:
+            params = f.readlines()[index]
+            saved_planets = params.split(":")
+            for sp in saved_planets:
+                p = sp.split("|")
+                planet = Planet(pos=list(map(float, p[0])), vel=list(map(float, p[1])), mass=float(p[2]), canvas=canvas)
+                planets.append(planet)
+    else:
+        num_planets = int(input("Enter number of planets: "))
+        for i in range(num_planets):
+            pos = [float(s) for s in str(input(f"Enter planet {i+1} initial position - ex: 100,-30,20 : ")).split(",")]
+            vel = [float(v) for v in str(input(f"Enter planet {i+1} initial velocity - ex: 50,10,65.7 : ")).split(",")]
+            mass = float(input(f"Enter planet {i+1} mass - ex: 1e15 : ")) 
+       
+            planet = Planet(pos=pos, vel=vel, mass=mass, canvas=canvas)
+            planets.append(planet)
+
+    global stretch
+    stretch = float(input("Enter color stretch factor (0,1] - "))
+
+    planets_save = planets.copy()
+
     canvas.configure(bg="black")
     
     thread = Thread(target=run, args = (planets,))
+    thread.daemon = True
     thread.start()
-    
+  
     root.mainloop()
     
+    save_thread = Thread(target=save_params, args=(planets_save,))
+    save_thread.daemon = True
+    save_thread.start()
+    
+    while save_bool: continue
+
+
 if __name__ == "__main__":
     main()
