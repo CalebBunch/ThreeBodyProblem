@@ -54,6 +54,19 @@ class Planet:
         self._pos = newpos
         self._turtle.goto(newpos[0], newpos[1])
 
+        #r_val = (lambda z: 1/(1+math.exp(-z)))(newpos[2])
+        #g_val = (lambda z: (z/(1+abs(z))+1)/2)(newpos[2])
+        #b_val = (lambda z: (math.tanh(z)+1)/2)(newpos[2])
+
+        sigbase = (lambda z: (z/(1+abs(z))+1)/2)(newpos[2])
+
+        r_val = sigbase/4
+        g_val = sigbase/2
+        b_val = sigbase
+
+        self._turtle.color((r_val, g_val, b_val))
+
+
 # Velocity
 
     @property
@@ -127,7 +140,8 @@ def update(planets: list[Planet], dt: float) -> None:
         forces = [0, 0, 0]
         for j in range(len(planets)):
             if i != j:
-                print(len(planets[j].pos), planets[j].pos)
+                #print(len(planets[j].pos), planets[j].pos)
+                #print(planets[j].pos[2], j)
                 forces = list(map(sum, zip(forces, planets[i].gravitational_force(planets[j]))))
         planets[i].acc = [f / planets[i].mass for f in forces]
 
@@ -181,9 +195,14 @@ def main() -> None:
 
     #planet1 = Planet(pos=[-100, 0, 0], vel=[34.71128135672417, 53.2726851767674, 0], mass=1e15, canvas=canvas)
     
-    planet1 = Planet(pos=[-100, 0, 0], vel=[34.71128135672417, 53.2726851767674, 0], mass=1e15, canvas=canvas)
-    planet2 = Planet(pos=[0, 0, 0], vel=[0, 0, 10], mass=1e15, canvas=canvas)
-    planet3 = Planet(pos=[100, 0, 0], vel=[0, 0, 0], mass=1e15, canvas=canvas)
+    
+    planet1 = Planet(pos=[-100, 100, 50], vel=[34.71128135672417, 53.2726851767674, 0], mass=1e15, canvas=canvas)
+    planet2 = Planet(pos=[0, 100, 30], vel=[0, 0, 19], mass=1e15, canvas=canvas)
+    planet3 = Planet(pos=[100, 100, 50], vel=[0, 0, 0], mass=1e15, canvas=canvas)
+
+    #planet1 = Planet(pos=[-300, 300, 50], vel=[10, 10, -10], mass=1e15, canvas=canvas)
+    #planet2 = Planet(pos=[0, 100, 30], vel=[0, 0, 0], mass=1e15, canvas=canvas)
+    #planet3 = Planet(pos=[-100, 150, 0], vel=[5, 5, 0], mass=1e15, canvas=canvas)
     planets = [planet1, planet2, planet3]
     
     #root.bind("<r>", lambda event : r_key_pressed(event, planets=planets, canvas=canvas))
