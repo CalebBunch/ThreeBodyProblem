@@ -7,7 +7,6 @@ from pathlib import Path
 
 SAVE_PATH = Path("parameters.txt")
 G = 6.674 * 10e-11
-stretch = 0.01
 save_bool = True
 
 
@@ -34,12 +33,10 @@ class Planet:
     def pos(self, newpos: list[float]) -> None:
         self._pos = newpos
         self._turtle.goto(newpos[0], newpos[1])
-
         sigbase = (lambda z: 1/(1+math.exp(-stretch*z)))(newpos[2])
         r_val = sigbase
         g_val = sigbase
         b_val = sigbase*(-1)+1
-
         self._turtle.color((r_val, g_val, b_val))
 
 
@@ -166,13 +163,10 @@ def main() -> None:
     root.title ("Body Simulation")
     root.resizable(False, False)
     root.withdraw()
-    
     canvas = tk.Canvas(root, width=900, height=900)
     canvas.pack()
 
     planets = []
-
-    #ADD try/catch for user input
     load = str(input("Would you like to load parameters from the save file (y/n)? ")).lower()
     if "y" in load:
         index = int(input("Enter the line number for desired parameters: ")) - 1
@@ -204,15 +198,15 @@ def main() -> None:
         save_vel.append(planet.vel)
         save_mass.append(planet.mass)
 
-    root.deiconify()
     canvas.configure(bg="black")
     
     run_thread = Thread(target=run, args = (planets,))
     run_thread.daemon = True
     run_thread.start()
-  
+
+    root.deiconify()
     root.mainloop()
-    
+
     save_thread = Thread(target=save_params, args=(save_pos, save_vel, save_mass,))
     save_thread.daemon = True
     save_thread.start()
