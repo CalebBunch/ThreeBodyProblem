@@ -31,15 +31,15 @@ class Planet:
         self._pos = newpos
         self._turtle.goto(newpos[0], newpos[1])
 
-        #r_val = (lambda z: 1/(1+math.exp(-z)))(newpos[2])
+        sigbase = (lambda z: 1/(1+math.exp(-0.01*z)))(newpos[2]) #change 0.01 for diff colors??
         #g_val = (lambda z: (z/(1+abs(z))+1)/2)(newpos[2])
         #b_val = (lambda z: (math.tanh(z)+1)/2)(newpos[2])
 
-        sigbase = (lambda z: (z/(1+abs(z))+1)/2)(newpos[2])
+        #sigbase = (lambda z: (z/(1+abs(z))+1)/2)(newpos[2])
 
-        r_val = sigbase/4
-        g_val = sigbase/2
-        b_val = sigbase
+        r_val = sigbase
+        g_val = sigbase
+        b_val = sigbase*(-1)+1
 
         self._turtle.color((r_val, g_val, b_val))
 
@@ -116,7 +116,7 @@ def update(planets: list[Planet], dt: float) -> None:
         for j in range(len(planets)):
             if i != j:
                 #print(len(planets[j].pos), planets[j].pos)
-                #print(planets[j].pos[2], j)
+                print(planets[j].pos[2], j)
                 forces = list(map(sum, zip(forces, planets[i].gravitational_force(planets[j]))))
         planets[i].acc = [f / planets[i].mass for f in forces]
 
@@ -137,10 +137,11 @@ def vector_magnitude(v: list[float]) -> float:
     return sum([s * s for s in v]) ** 0.5
 
 def run(planets: list[Planet]) -> None:
-    t = time.clock_gettime(time.CLOCK_MONOTONIC)
+    #t = time.clock_gettime(time.CLOCK_MONOTONIC)
     i = 0
     while True:
-        #dt = time.clock_gettime(timewhite.CLOCK_MONOTONIC) - t  # in seconds
+        #dt = time.clock_gettime(time.CLOCK_MONOTONIC) - t  # in seconds
+        
         dt = 0.01
         update(planets, dt)
         #t = time.clock_gettime(time.CLOCK_MONOTONIC)
@@ -157,9 +158,9 @@ def main() -> None:
     canvas = tk.Canvas(root, width=900, height=900)
     canvas.pack()
     
-    planet1 = Planet(pos=[-100, 100, 50], vel=[34.71128135672417, 53.2726851767674, 0], mass=1e15, canvas=canvas)
-    planet2 = Planet(pos=[0, 100, 30], vel=[0, 0, 19], mass=1e15, canvas=canvas)
-    planet3 = Planet(pos=[100, 100, 50], vel=[0, 0, 0], mass=1e15, canvas=canvas)
+    planet1 = Planet(pos=[-100, 0, 0], vel=[34.71128135672417, 53.2726851767674, 0], mass=1e15, canvas=canvas)
+    planet2 = Planet(pos=[0, 0, 0], vel=[0, 0, 19], mass=1e15, canvas=canvas)
+    planet3 = Planet(pos=[100, 0, 0], vel=[0, 0, 0], mass=1e15, canvas=canvas)
 
     #planet1 = Planet(pos=[-300, 300, 50], vel=[10, 10, -10], mass=1e15, canvas=canvas)
     #planet2 = Planet(pos=[0, 100, 30], vel=[0, 0, 0], mass=1e15, canvas=canvas)
