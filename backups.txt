@@ -1,0 +1,3 @@
+    planet1 = Planet(pos=[-100, 0, 0], vel=[34.71128135672417, 53.2726851767674, 0], mass=1e15, canvas=canvas)
+    planet2 = Planet(pos=[0, 10, 50], vel=[0, 0, 19], mass=1.5e15, canvas=canvas)
+    planet3 = Planet(pos=[100, 0, 0], vel=[-30, -50, 0], mass=1e15, canvas=canvas)
