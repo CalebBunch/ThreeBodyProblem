@@ -1,14 +1,13 @@
 import tkinter as tk
 import turtle
-import time
 from threading import Thread
 import math
 
-#TODO tkinter initial positions/color customization, dt?
+# TODO tkinter initial positions/color customization, dt?
 
 G = 6.674 * 10e-11
 
-sig_stretch = 0.01
+STRETCH = 0.01
 
 class Planet:
     def __init__(self, pos: list[float], vel: list[float], mass: float, canvas: tk.Canvas) -> None:
@@ -23,23 +22,18 @@ class Planet:
         self._turtle.goto(self._pos[0], self._pos[1])
         self._turtle.pendown()
 
-# Position
+
     @property
     def pos(self) -> list[float]:
         return self._pos
+
 
     @pos.setter
     def pos(self, newpos: list[float]) -> None:
         self._pos = newpos
         self._turtle.goto(newpos[0], newpos[1])
 
-        global sig_stretch # make changeable with tkinter gui. must be between 0 and 1
-        sigbase = (lambda z: 1/(1+math.exp(-sig_stretch*z)))(newpos[2])
-        #g_val = (lambda z: (z/(1+abs(z))+1)/2)(newpos[2])
-        #b_val = (lambda z: (math.tanh(z)+1)/2)(newpos[2])
-
-        #sigbase = (lambda z: (z/(1+abs(z))+1)/2)(newpos[2])
-
+        sigbase = (lambda z: 1/(1+math.exp(-STRETCH*z)))(newpos[2])
         r_val = sigbase
         g_val = sigbase
         b_val = sigbase*(-1)+1
@@ -47,36 +41,34 @@ class Planet:
         self._turtle.color((r_val, g_val, b_val))
 
 
-# Velocity
-
     @property
     def vel(self) -> list[float]:
         return self._vel
+
 
     @vel.setter
     def vel(self, newvel: list[float]) -> None:
         self._vel = newvel
 
-# Acceleration
 
     @property
     def acc(self) -> list[float]:
         return self._acc
+
 
     @acc.setter
     def acc(self, newacc: list[float]) -> None:
         self._acc = newacc
 
 
-# Mass
-
     @property
     def mass(self) -> float:
         return self._mass
 
-# Helpers
+
     def calculate_distance_vector(self, other: "Planet") -> list[float]:
         return [self._pos[i]-other.pos[i] for i in range(len(self._pos))]
+
 
     def gravitational_force(self, other: "Planet") -> list[float]:
         dist_vector = self.calculate_distance_vector(other)
@@ -113,13 +105,12 @@ class Planet:
         
         return([grav_x, grav_y, grav_z])
 
+
 def update(planets: list[Planet], dt: float) -> None:
     for i in range(len(planets)):
         forces = [0, 0, 0]
         for j in range(len(planets)):
             if i != j:
-                #print(len(planets[j].pos), planets[j].pos)
-                #print(planets[j].pos[2], j)
                 forces = list(map(sum, zip(forces, planets[i].gravitational_force(planets[j]))))
         planets[i].acc = [f / planets[i].mass for f in forces]
 
@@ -137,21 +128,15 @@ def update(planets: list[Planet], dt: float) -> None:
             planets[i].pos[2] + dt * planets[i].vel[2]
         ]
 
+
 def vector_magnitude(v: list[float]) -> float:
     return sum([s * s for s in v]) ** 0.5
 
+
 def run(planets: list[Planet]) -> None:
-    #t = time.clock_gettime(time.CLOCK_MONOTONIC)*1e-20
-    #i = 0
     while True:
-        #dt = time.clock_gettime(time.CLOCK_MONOTONIC)*1e-20 - t  # in seconds
-        
         dt = 0.01
         update(planets, dt)
-        #t = time.clock_gettime(time.CLOCK_MONOTONIC)*1e-20
-        #i += 1
-        #if i > 1:
-        #    break
 
 
 def main() -> None:
