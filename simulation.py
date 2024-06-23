@@ -83,18 +83,24 @@ class Planet:
 
 # Helpers
     def calculate_distance_vector(self, other: "Planet") -> list[float]:
-        return [self._pos[0] - other.pos[0], self._pos[1] - other.pos[1]]
+        #print(len(other.pos))
+        return [self._pos[i]-other.pos[i] for i in range(len(self._pos))]
+        # return [self._pos[0] - other.pos[0], self._pos[1] - other.pos[1]]
 
     def gravitational_force(self, other: "Planet") -> list[float]:
         dist_vector = self.calculate_distance_vector(other)
-        theta = math.atan(dist_vector[1] / (dist_vector[0] + 1e-9)) # angle of force
+        theta = math.atan(dist_vector[1] / (dist_vector[0] + 1e-9)) # angle of force in x y plane
+ 
         if vector_magnitude(dist_vector) == 0:
-            gravity_mag = 0
+            grav_mag = 0
         else:
-            gravity_mag = (G * self._mass * other.mass) / (vector_magnitude(dist_vector)**2)
-        
-        grav_x = gravity_mag*math.cos(theta)
-        grav_y = gravity_mag*math.sin(theta)
+            grav_mag = (G * self._mass * other.mass) / (vector_magnitude(dist_vector)**2)
+       
+        phi = math.asin(dist_vector[2] / (vector_magnitude(dist_vector) + 1e-9))
+
+        grav_x = grav_mag*math.cos(theta)*math.cos(phi)
+        grav_y = grav_mag*math.sin(theta)*math.cos(phi)
+        grav_z = grav_mag*math.sin(phi)
 
         if self._pos[0] > other.pos[0]:
             grav_x = -abs(grav_x)
@@ -104,31 +110,38 @@ class Planet:
             grav_y = -abs(grav_y)
         if self.pos[1] < other.pos[1]:
             grav_y = abs(grav_y)
+        if self._pos[2] > other.pos[2]:
+            grav_z = -abs(grav_z)
+        if self._pos[2] < other.pos[2]:
+            grav_z = abs(grav_z)
 
         if vector_magnitude(dist_vector) < 5:
-            grav_x, grav_y = 0, 0
+            grav_x, grav_y, grav_z = 0, 0, 0
         
         #print(grav_x, grav_y)
         #print(dist_vector)
-        return([grav_x, grav_y])
+        return([grav_x, grav_y, grav_z])
 
 def update(planets: list[Planet], dt: float) -> None:
     for i in range(len(planets)):
-        forces = [0, 0]
+        forces = [0, 0, 0]
         for j in range(len(planets)):
             if i != j:
+                print(len(planets[j].pos), planets[j].pos)
                 forces = list(map(sum, zip(forces, planets[i].gravitational_force(planets[j]))))
         planets[i].acc = [f / planets[i].mass for f in forces]
 
         planets[i].vel = [
             planets[i].vel[0] + dt * planets[i].acc[0],
-            planets[i].vel[1] + dt * planets[i].acc[1]
+            planets[i].vel[1] + dt * planets[i].acc[1],
+            planets[i].vel[2] + dt * planets[i].acc[2]
         ]
 
     for i in range(len(planets)):
         planets[i].pos = [
             planets[i].pos[0] + dt * planets[i].vel[0],
-            planets[i].pos[1] + dt * planets[i].vel[1]
+            planets[i].pos[1] + dt * planets[i].vel[1],
+            planets[i].pos[2] + dt * planets[i].vel[2]
         ]
 
 def vector_magnitude(v: list[float]) -> float:
@@ -166,12 +179,14 @@ def main() -> None:
     canvas = tk.Canvas(root, width=900, height=900)
     canvas.pack()
 
+    #planet1 = Planet(pos=[-100, 0, 0], vel=[34.71128135672417, 53.2726851767674, 0], mass=1e15, canvas=canvas)
+    
     planet1 = Planet(pos=[-100, 0, 0], vel=[34.71128135672417, 53.2726851767674, 0], mass=1e15, canvas=canvas)
-    planet2 = Planet(pos=[0, 0, 0], vel=[0, 0, 0], mass=1e15, canvas=canvas)
+    planet2 = Planet(pos=[0, 0, 0], vel=[0, 0, 10], mass=1e15, canvas=canvas)
     planet3 = Planet(pos=[100, 0, 0], vel=[0, 0, 0], mass=1e15, canvas=canvas)
     planets = [planet1, planet2, planet3]
     
-    root.bind("<r>", lambda event : r_key_pressed(event, planets=planets, canvas=canvas))
+    #root.bind("<r>", lambda event : r_key_pressed(event, planets=planets, canvas=canvas))
     
     canvas.configure(bg="black")
     
