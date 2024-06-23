@@ -141,17 +141,16 @@ def run(planets: list[Planet]) -> None:
         update(planets, dt)
 
 
-def save_params(planets: list[Planet]) -> None:
+def save_params(save_pos: list[list[float]], save_vel: list[list[float]], save_mass: list[float]) -> None:
     save = str(input("Would you like to save these parameters (y/n)? ")).lower()
     if "y" in save:
         with open(SAVE_PATH, "a") as f:
-            # "1,2,3-3,4,3-3:-3,1,1-3,1,4-2"
             data = []
-            for planet in planets:
-                data.append(",".join(map(str, planet.pos)) + "|")
-                data.append(",".join(map(str, planet.vel)) + "|")
-                data.append(str(planet.mass))
-                if planet != planets[-1]:
+            for i in range(len(save_mass)):
+                data.append(",".join(map(str, save_pos[i])) + "|")
+                data.append(",".join(map(str, save_vel[i])) + "|")
+                data.append(str(save_mass[i]))
+                if i != len(save_mass)-1:
                     data.append(":")
                 else:
                     data.append("\n")
@@ -165,13 +164,15 @@ def save_params(planets: list[Planet]) -> None:
 def main() -> None:
     root = tk.Tk()
     root.title ("Body Simulation")
-    root.resizable(0, 0)
+    root.resizable(False, False)
+    root.withdraw()
     
     canvas = tk.Canvas(root, width=900, height=900)
     canvas.pack()
 
     planets = []
-    
+
+    #ADD try/catch for user input
     load = str(input("Would you like to load parameters from the save file (y/n)? ")).lower()
     if "y" in load:
         index = int(input("Enter the line number for desired parameters: ")) - 1
@@ -180,7 +181,7 @@ def main() -> None:
             saved_planets = params.split(":")
             for sp in saved_planets:
                 p = sp.split("|")
-                planet = Planet(pos=list(map(float, p[0])), vel=list(map(float, p[1])), mass=float(p[2]), canvas=canvas)
+                planet = Planet(pos=list(map(float, p[0].split(","))), vel=list(map(float, p[1].split(","))), mass=float(p[2]), canvas=canvas)
                 planets.append(planet)
     else:
         num_planets = int(input("Enter number of planets: "))
@@ -195,17 +196,24 @@ def main() -> None:
     global stretch
     stretch = float(input("Enter color stretch factor (0,1] - "))
 
-    planets_save = planets.copy()
+    save_pos = []
+    save_vel = []
+    save_mass = []
+    for planet in planets:
+        save_pos.append(planet.pos)
+        save_vel.append(planet.vel)
+        save_mass.append(planet.mass)
 
+    root.deiconify()
     canvas.configure(bg="black")
     
-    thread = Thread(target=run, args = (planets,))
-    thread.daemon = True
-    thread.start()
+    run_thread = Thread(target=run, args = (planets,))
+    run_thread.daemon = True
+    run_thread.start()
   
     root.mainloop()
     
-    save_thread = Thread(target=save_params, args=(planets_save,))
+    save_thread = Thread(target=save_params, args=(save_pos, save_vel, save_mass,))
     save_thread.daemon = True
     save_thread.start()
     
